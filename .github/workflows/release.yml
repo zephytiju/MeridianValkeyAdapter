@@ -3,56 +3,167 @@ name: Release
 
 on:
   push:
-    tags: ["v*"]
+    tags: ["v[0-9]*.[0-9]*.[0-9]*"]
   workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing immutable release tag to verify or repair
+        required: true
+        type: string
+      publish_pypi:
+        description: Publish rebuilt distributions through PyPI trusted publishing
+        required: false
+        default: false
+        type: boolean
 
 permissions:
-  contents: write
-  id-token: write
-  attestations: write
+  contents: read
+
+env:
+  RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
+
+concurrency:
+  group: release-${{ inputs.tag || github.ref_name }}
+  cancel-in-progress: false
 
 jobs:
-  release:
+  build:
+    name: Verify, build, and attest
     runs-on: ubuntu-24.04
-    environment: pypi
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
     steps:
-      - uses: actions/checkout@v4
+      - name: Check out the immutable release tag
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
-      - uses: actions/setup-python@v5
+          persist-credentials: false
+          ref: ${{ env.RELEASE_TAG }}
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: "3.12"
           cache: pip
-      - run: python -m pip install --require-hashes -r requirements.lock
-      - run: python -m pip install --no-build-isolation --no-deps .
-      - run: ./scripts/verify.sh
-      - run: ./scripts/test-integration.sh
-      - run: ./scripts/test-failover.sh
-      - name: Build release artifacts
+      - name: Install hash-locked dependencies
+        run: python -m pip install --require-hashes -r requirements.lock
+      - name: Install the package from tagged source
+        run: python -m pip install --no-build-isolation --no-deps .
+      - name: Verify tag, package version, and main ancestry
         run: |
-          rm -rf dist
-          SOURCE_DATE_EPOCH="$(git show -s --format=%ct HEAD)" python -m build --no-isolation
+          if [[ ! "$RELEASE_TAG" =~ ^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$ ]]; then
+            echo "release tag is not canonical SemVer" >&2
+            exit 1
+          fi
+          test "$(git cat-file -t "refs/tags/$RELEASE_TAG")" = tag
+          test "$(git rev-parse "refs/tags/$RELEASE_TAG^{commit}")" = "$(git rev-parse HEAD)"
+          test "$RELEASE_TAG" = "v$(python -c 'from meridian_storage.adapters.valkey import __version__; print(__version__)')"
+          git fetch origin main --no-tags
+          git merge-base --is-ancestor HEAD origin/main
+          echo "SOURCE_DATE_EPOCH=$(git show -s --format=%ct HEAD)" >> "$GITHUB_ENV"
+      - name: Run complete verification
+        run: ./scripts/verify.sh
+      - name: Run standalone conformance
+        run: ./scripts/test-integration.sh
+      - name: Run Sentinel failover conformance
+        run: ./scripts/test-failover.sh
+      - name: Build deterministic release bundle
+        run: |
+          rm -rf dist release
+          python -m build --no-isolation
           python -m twine check dist/*
           python scripts/generate-release-evidence.py
-          sha256sum dist/* evidence/release-evidence.json > checksums.txt
-      - uses: actions/attest-build-provenance@v2
+          mkdir release
+          cp dist/*.whl dist/*.tar.gz evidence/release-evidence.json release/
+          cd release
+          sha256sum *.whl *.tar.gz release-evidence.json > SHA256SUMS
+      - name: Attest distribution provenance
+        uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
         with:
-          subject-path: "dist/*"
-      - uses: actions/upload-artifact@v4
+          subject-path: |
+            release/*.whl
+            release/*.tar.gz
+      - name: Upload Python distributions
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: meridian-storage-valkey-${{ github.ref_name }}
+          name: python-distributions
           path: |
-            dist/*
-            checksums.txt
-            evidence/release-evidence.json
+            release/*.whl
+            release/*.tar.gz
           if-no-files-found: error
-      - name: Publish GitHub release
-        if: startsWith(github.ref, 'refs/tags/v')
+      - name: Upload release evidence
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: release-evidence
+          path: |
+            release/SHA256SUMS
+            release/release-evidence.json
+          if-no-files-found: error
+
+  github-release:
+    name: Publish or verify immutable GitHub release
+    needs: build
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - name: Download Python distributions
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: python-distributions
+          path: release
+      - name: Download release evidence
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: release-evidence
+          path: release
+      - name: Create or verify immutable GitHub release
         env:
           GH_TOKEN: ${{ github.token }}
-        run: >-
-          gh release create "$GITHUB_REF_NAME" dist/* checksums.txt
-          evidence/release-evidence.json --verify-tag --generate-notes
-      - name: Publish to PyPI with trusted identity
-        if: startsWith(github.ref, 'refs/tags/v')
-        uses: pypa/gh-action-pypi-publish@release/v1
+        run: |
+          if gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            mkdir published-release
+            gh release download "$RELEASE_TAG" \
+              --repo "$GITHUB_REPOSITORY" \
+              --dir published-release
+            ls -1 release | sort > expected-assets.txt
+            gh release view "$RELEASE_TAG" \
+              --repo "$GITHUB_REPOSITORY" \
+              --json assets --jq '.assets[].name' | sort > published-assets.txt
+            diff -u expected-assets.txt published-assets.txt
+            for artifact in release/*; do
+              cmp "$artifact" "published-release/$(basename "$artifact")"
+            done
+          else
+            gh release create "$RELEASE_TAG" release/* \
+              --repo "$GITHUB_REPOSITORY" \
+              --verify-tag \
+              --generate-notes \
+              --title "meridian-storage-valkey $RELEASE_TAG"
+          fi
+
+  publish-pypi:
+    name: Publish to PyPI with OIDC
+    if: >-
+      (github.event_name == 'push' && vars.PYPI_TRUSTED_PUBLISHING_ENABLED == 'true') ||
+      (github.event_name == 'workflow_dispatch' && inputs.publish_pypi)
+    needs: [build, github-release]
+    runs-on: ubuntu-24.04
+    environment:
+      name: pypi
+      url: https://pypi.org/project/meridian-storage-valkey/
+    permissions:
+      id-token: write
+    steps:
+      - name: Download Python distributions
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: python-distributions
+          path: dist
+      - name: Publish distributions
+        uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # v1.14.2
+        with:
+          packages-dir: dist
+          attestations: true
