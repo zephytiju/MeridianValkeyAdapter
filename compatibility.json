@@ -1,0 +1,47 @@
+{
+  "$comment": "SPDX-License-Identifier: Apache-2.0",
+  "adapterContract": "1.0.0",
+  "catalogContracts": {
+    "cache": "1.0.0"
+  },
+  "core": {
+    "distribution": "meridian-storage-core",
+    "sdistSha256": "2c44d44569a380f44ea7f797e7fe623d0242fa79b6bc34606d6bad1bc53f2d5a",
+    "version": "1.0.0",
+    "wheelSha256": "6b8ebb70ee1a8467a96d668878a8eebf826c1c4b63b3832ae70f2c630a8ef4a1"
+  },
+  "design": {
+    "catalogsRevision": 70,
+    "engineAdaptersRevision": 24,
+    "hldRevision": 56,
+    "meridianConstructsRevision": 45,
+    "valkeyLldRevision": 12
+  },
+  "distribution": "meridian-storage-valkey",
+  "engine": {
+    "profiles": ["valkey-sentinel", "valkey-standalone"],
+    "versions": ["8.1.9"]
+  },
+  "formatVersion": "meridian-valkey-compatibility.v1",
+  "python": ">=3.12,<3.15",
+  "queryPredecessor": {
+    "distribution": "meridian-storage-query",
+    "runtimeDependency": false,
+    "sdistSha256": "ac7d1747e0b9574810f79cfda99abbdd6d0dac230107b655de386871eb8ca9dc",
+    "version": "1.0.0",
+    "wheelSha256": "b7ae4572ae70fb51ec190080df40fd10e667d69634ee811f0a7e3f72b56e41cc"
+  },
+  "semantics": {
+    "distribution": "meridian-storage-semantics",
+    "sdistSha256": "02605909db5dc7ff22d4ae5e3ae1b3fe6c25a68e9ecaa4c3ead36082848d0311",
+    "version": "1.0.0",
+    "wheelSha256": "76fced0bc083f145fad1949b85147a3563f3584f99994471693915a8ba1851ec"
+  },
+  "valkeyClient": {
+    "distribution": "valkey",
+    "version": "6.1.1",
+    "wheelSha256": "e2691541c6e1503b53c714ad9a35551ac9b7c0bbac93865f063dbc859a46de92"
+  },
+  "version": "1.0.0"
+}
+

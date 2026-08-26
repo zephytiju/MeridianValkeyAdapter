@@ -1,0 +1,26 @@
+# SPDX-License-Identifier: Apache-2.0
+
+services:
+  valkey:
+    image: valkey/valkey:8.1.9@sha256:e0eb7c480958d32bdc4357a74bdd70653ae15f2f9b4c93c4a5a9fad1dc471c84
+    command:
+      - valkey-server
+      - --requirepass
+      - meridian-test-password
+      - --maxmemory
+      - 16mb
+      - --maxmemory-policy
+      - allkeys-lru
+      - --save
+      - ""
+      - --appendonly
+      - "no"
+    ports:
+      - "127.0.0.1:6391:6379"
+    healthcheck:
+      test: ["CMD", "valkey-cli", "-a", "meridian-test-password", "PING"]
+      interval: 1s
+      timeout: 1s
+      retries: 30
+    tmpfs:
+      - /data

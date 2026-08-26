@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/zephytiju/meridian-storage-valkey/contracts/release-evidence.schema.json",
+  "$comment": "SPDX-License-Identifier: Apache-2.0",
+  "title": "Meridian Valkey release evidence",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "formatVersion",
+    "version",
+    "sourceRevision",
+    "compatibilityDigest",
+    "conformanceVectorDigest",
+    "artifacts",
+    "verification"
+  ],
+  "properties": {
+    "$comment": {"type": "string"},
+    "formatVersion": {"const": "meridian-valkey-release-evidence.v1"},
+    "version": {"type": "string"},
+    "sourceRevision": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "compatibilityDigest": {"$ref": "#/$defs/fingerprint"},
+    "conformanceVectorDigest": {"$ref": "#/$defs/fingerprint"},
+    "artifacts": {
+      "type": "object",
+      "minProperties": 2,
+      "additionalProperties": {"$ref": "#/$defs/fingerprint"}
+    },
+    "verification": {
+      "type": "object",
+      "required": ["unitContractConformance", "standalone", "sentinelFailover"],
+      "properties": {
+        "unitContractConformance": {"const": "passed"},
+        "standalone": {"const": "passed"},
+        "sentinelFailover": {"const": "passed"}
+      }
+    }
+  },
+  "$defs": {
+    "fingerprint": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+  }
+}

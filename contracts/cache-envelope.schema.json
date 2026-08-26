@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/zephytiju/meridian-storage-valkey/contracts/cache-envelope.schema.json",
+  "$comment": "SPDX-License-Identifier: Apache-2.0",
+  "title": "Meridian Valkey V1 decoded envelope metadata",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "formatVersion",
+    "serializerId",
+    "schemaFingerprint",
+    "sourceVersion",
+    "createdAtMs",
+    "expiresAtMs",
+    "payloadDigest",
+    "payloadLength",
+    "envelopeVersion"
+  ],
+  "properties": {
+    "formatVersion": {"const": "meridian-valkey-envelope.v1"},
+    "serializerId": {"enum": ["canonical-json", "raw-bytes"]},
+    "schemaFingerprint": {"$ref": "#/$defs/fingerprint"},
+    "sourceVersion": {"type": ["string", "integer", "null"]},
+    "createdAtMs": {"type": "integer", "minimum": 0},
+    "expiresAtMs": {"type": "integer", "minimum": 1},
+    "payloadDigest": {"$ref": "#/$defs/fingerprint"},
+    "payloadLength": {"type": "integer", "minimum": 0},
+    "envelopeVersion": {"$ref": "#/$defs/fingerprint"}
+  },
+  "$defs": {
+    "fingerprint": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+  }
+}

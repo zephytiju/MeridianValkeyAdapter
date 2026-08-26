@@ -1,0 +1,117 @@
+# SPDX-License-Identifier: Apache-2.0
+
+x-valkey-node: &valkey-node
+  image: valkey/valkey:8.1.9@sha256:e0eb7c480958d32bdc4357a74bdd70653ae15f2f9b4c93c4a5a9fad1dc471c84
+  healthcheck:
+    test: ["CMD", "valkey-cli", "-a", "meridian-test-password", "PING"]
+    interval: 1s
+    timeout: 1s
+    retries: 30
+  tmpfs:
+    - /data
+
+x-sentinel: &sentinel
+  image: valkey/valkey:8.1.9@sha256:e0eb7c480958d32bdc4357a74bdd70653ae15f2f9b4c93c4a5a9fad1dc471c84
+  command:
+    - sh
+    - -c
+    - cp /template/sentinel.conf /tmp/sentinel.conf && exec valkey-sentinel /tmp/sentinel.conf
+  volumes:
+    - ./sentinel.conf:/template/sentinel.conf:ro
+  depends_on:
+    primary:
+      condition: service_healthy
+    replica1:
+      condition: service_healthy
+    replica2:
+      condition: service_healthy
+  healthcheck:
+    test:
+      [
+        "CMD-SHELL",
+        "valkey-cli -p 26379 -a meridian-test-password SENTINEL CKQUORUM meridian-cache 2>/dev/null | grep -q OK",
+      ]
+    interval: 1s
+    timeout: 1s
+    retries: 30
+
+services:
+  primary:
+    <<: *valkey-node
+    command:
+      - valkey-server
+      - --requirepass
+      - meridian-test-password
+      - --maxmemory
+      - 64mb
+      - --maxmemory-policy
+      - allkeys-lru
+      - --save
+      - ""
+      - --appendonly
+      - "no"
+    ports:
+      - "127.0.0.1:6392:6379"
+
+  replica1:
+    <<: *valkey-node
+    command:
+      - valkey-server
+      - --replicaof
+      - primary
+      - "6379"
+      - --masterauth
+      - meridian-test-password
+      - --requirepass
+      - meridian-test-password
+      - --replica-announce-ip
+      - replica1
+      - --maxmemory
+      - 64mb
+      - --maxmemory-policy
+      - allkeys-lru
+      - --save
+      - ""
+      - --appendonly
+      - "no"
+    ports:
+      - "127.0.0.1:6393:6379"
+
+  replica2:
+    <<: *valkey-node
+    command:
+      - valkey-server
+      - --replicaof
+      - primary
+      - "6379"
+      - --masterauth
+      - meridian-test-password
+      - --requirepass
+      - meridian-test-password
+      - --replica-announce-ip
+      - replica2
+      - --maxmemory
+      - 64mb
+      - --maxmemory-policy
+      - allkeys-lru
+      - --save
+      - ""
+      - --appendonly
+      - "no"
+    ports:
+      - "127.0.0.1:6394:6379"
+
+  sentinel1:
+    <<: *sentinel
+    ports:
+      - "127.0.0.1:26391:26379"
+
+  sentinel2:
+    <<: *sentinel
+    ports:
+      - "127.0.0.1:26392:26379"
+
+  sentinel3:
+    <<: *sentinel
+    ports:
+      - "127.0.0.1:26393:26379"

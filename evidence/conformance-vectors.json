@@ -1,0 +1,38 @@
+{
+  "$comment": "SPDX-License-Identifier: Apache-2.0",
+  "descriptor": {
+    "capabilityFingerprint": "sha256:c5453da3de99b7942c51ada33a87db8b3b09ca9ab4d4cd470bd620efe02d47dc",
+    "engineVersion": "8.1.9",
+    "operationContracts": [
+      "meridian.cache.compare_and_set",
+      "meridian.cache.delete",
+      "meridian.cache.get",
+      "meridian.cache.invalidate",
+      "meridian.cache.put",
+      "meridian.cache.put_if_absent"
+    ]
+  },
+  "envelopes": {
+    "canonicalJson": {
+      "encodedBase64": "TVJWSzF8c2hhMjU2OmEyOGYxOGFiMjhjZDE4YjE3NDFjNWY4MDBmZjQxOWRhOTMyZDczMTc0YWY0ZTcxZjc2MGU4ZmZhM2YwMGE4ODR8MDAwMDAxYzl8eyJjcmVhdGVkQXRNcyI6MTcwMDAwMDAwMDAwMCwiZW52ZWxvcGVWZXJzaW9uIjoic2hhMjU2OmEyOGYxOGFiMjhjZDE4YjE3NDFjNWY4MDBmZjQxOWRhOTMyZDczMTc0YWY0ZTcxZjc2MGU4ZmZhM2YwMGE4ODQiLCJleHBpcmVzQXRNcyI6MTcwMDAwMDA2MDAwMCwiZm9ybWF0VmVyc2lvbiI6Im1lcmlkaWFuLXZhbGtleS1lbnZlbG9wZS52MSIsInBheWxvYWREaWdlc3QiOiJzaGEyNTY6YjFjZWVjMjRkY2JmOGU5YTE5MjVhN2VlOGEwOGM4ZjNmNzljNmVhMzE1ZDViNDQ0NWE0NzE4MTU5NjQ5YTI4YyIsInBheWxvYWRMZW5ndGgiOjIzLCJzY2hlbWFGaW5nZXJwcmludCI6InNoYTI1NjoxMTExMTExMTExMTExMTExMTExMTExMTExMTExMTExMTExMTExMTExMTExMTExMTExMTExMTExMTExMTExMTExIiwic2VyaWFsaXplcklkIjoiY2Fub25pY2FsLWpzb24iLCJzb3VyY2VWZXJzaW9uIjoic291cmNlLTcifXsiYSI6W3RydWUsbnVsbF0sImIiOjJ9",
+      "version": "sha256:a28f18ab28cd18b1741c5f800ff419da932d73174af4e71f760e8ffa3f00a884"
+    },
+    "rawBytes": {
+      "encodedBase64": "TVJWSzF8c2hhMjU2OjlmNzkxOWM4YWNhZDg2ZmFlMjdlMWJmM2UzNzQ4NGEyMTgzNjRjNmRmMjcxYTg3ZDA2OGZjOWViODZmNmVhZGZ8MDAwMDAxYmV8eyJjcmVhdGVkQXRNcyI6MTcwMDAwMDAwMDAwMCwiZW52ZWxvcGVWZXJzaW9uIjoic2hhMjU2OjlmNzkxOWM4YWNhZDg2ZmFlMjdlMWJmM2UzNzQ4NGEyMTgzNjRjNmRmMjcxYTg3ZDA2OGZjOWViODZmNmVhZGYiLCJleHBpcmVzQXRNcyI6MTcwMDAwMDAwNTAwMCwiZm9ybWF0VmVyc2lvbiI6Im1lcmlkaWFuLXZhbGtleS1lbnZlbG9wZS52MSIsInBheWxvYWREaWdlc3QiOiJzaGEyNTY6MmMzYWZjN2Q1NGI5ZDQ5YmI0MWM0MDIyODgwMTU2ZDUwMWU4NzU0YzhjMGJmMzVjZTc0ZTE1ZDBmNjlmODdlOCIsInBheWxvYWRMZW5ndGgiOjEwLCJzY2hlbWFGaW5nZXJwcmludCI6InNoYTI1NjoxMTExMTExMTExMTExMTExMTExMTExMTExMTExMTExMTExMTExMTExMTExMTExMTExMTExMTExMTExMTExMTExIiwic2VyaWFsaXplcklkIjoicmF3LWJ5dGVzIiwic291cmNlVmVyc2lvbiI6bnVsbH0A/21lcmlkaWFu",
+      "version": "sha256:9f7919c8acad86fae27e1bf3e37484a218364c6df271a87d068fc9eb86f6eadf"
+    }
+  },
+  "formatVersion": "meridian-valkey-conformance.v1",
+  "keyEncoding": {
+    "atomicGroup": {
+      "left": "mrvk:v1:-4w7GB6VIxv8XlLk:g3:{W22QWBOYUNED0kynadS53O}:d:phPC9OXrn5XZ1LfoIAg-oDKk7YBFsoLrtJbzN31uH3U",
+      "right": "mrvk:v1:-4w7GB6VIxv8XlLk:g3:{W22QWBOYUNED0kynadS53O}:d:qK9abuQ8wtERcR7yVN2cPmqpn7uPebSlOC5ku4dyS0o",
+      "slot": 10727
+    },
+    "plain": "mrvk:v1:-4w7GB6VIxv8XlLk:g3:d:uwvR9ciRP-SkCNrRGh6Nf7d34g1rBgdrcxnRzAt-gsw"
+  },
+  "scripts": {
+    "compareAndSet": "sha1:dc3e0a72dc4d2ff0e209362fd16381ad7303d150",
+    "releaseLease": "sha1:af4f5da30cb9baa889aaa2022b6f84227f474d86"
+  }
+}
