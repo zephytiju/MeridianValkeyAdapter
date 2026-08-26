@@ -38,7 +38,7 @@ def test_existing_runtime_recovers_after_sentinel_promotes_replica() -> None:
     context = make_context(
         FakeValkey(), sentinel=True, settings_override=settings, endpoint=endpoints[0]
     )
-    ports = {"primary": 6392, "replica1": 6393, "replica2": 6394}
+    ports = {"172.30.99.10": 6392, "172.30.99.11": 6393, "172.30.99.12": 6394}
 
     def map_address(address: tuple[str, int]) -> tuple[str, int]:
         host, port = address
