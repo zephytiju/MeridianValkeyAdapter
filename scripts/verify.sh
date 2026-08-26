@@ -3,7 +3,13 @@
 set -euo pipefail
 
 repo_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-python_bin="${PYTHON:-$repo_dir/.venv/bin/python}"
+if [[ -n "${PYTHON:-}" ]]; then
+  python_bin="$PYTHON"
+elif [[ -x "$repo_dir/.venv/bin/python" ]]; then
+  python_bin="$repo_dir/.venv/bin/python"
+else
+  python_bin="python"
+fi
 
 cd "$repo_dir"
 "$python_bin" scripts/check-spdx.py

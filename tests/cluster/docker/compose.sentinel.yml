@@ -52,20 +52,23 @@ services:
       - "no"
     ports:
       - "127.0.0.1:6392:6379"
+    networks:
+      valkey:
+        ipv4_address: 172.30.99.10
 
   replica1:
     <<: *valkey-node
     command:
       - valkey-server
       - --replicaof
-      - primary
+      - 172.30.99.10
       - "6379"
       - --masterauth
       - meridian-test-password
       - --requirepass
       - meridian-test-password
       - --replica-announce-ip
-      - replica1
+      - 172.30.99.11
       - --maxmemory
       - 64mb
       - --maxmemory-policy
@@ -76,20 +79,23 @@ services:
       - "no"
     ports:
       - "127.0.0.1:6393:6379"
+    networks:
+      valkey:
+        ipv4_address: 172.30.99.11
 
   replica2:
     <<: *valkey-node
     command:
       - valkey-server
       - --replicaof
-      - primary
+      - 172.30.99.10
       - "6379"
       - --masterauth
       - meridian-test-password
       - --requirepass
       - meridian-test-password
       - --replica-announce-ip
-      - replica2
+      - 172.30.99.12
       - --maxmemory
       - 64mb
       - --maxmemory-policy
@@ -100,18 +106,36 @@ services:
       - "no"
     ports:
       - "127.0.0.1:6394:6379"
+    networks:
+      valkey:
+        ipv4_address: 172.30.99.12
 
   sentinel1:
     <<: *sentinel
     ports:
       - "127.0.0.1:26391:26379"
+    networks:
+      valkey:
+        ipv4_address: 172.30.99.21
 
   sentinel2:
     <<: *sentinel
     ports:
       - "127.0.0.1:26392:26379"
+    networks:
+      valkey:
+        ipv4_address: 172.30.99.22
 
   sentinel3:
     <<: *sentinel
     ports:
       - "127.0.0.1:26393:26379"
+    networks:
+      valkey:
+        ipv4_address: 172.30.99.23
+
+networks:
+  valkey:
+    ipam:
+      config:
+        - subnet: 172.30.99.0/24
