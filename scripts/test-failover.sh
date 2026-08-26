@@ -14,7 +14,13 @@ else
 fi
 
 cleanup() {
-  docker compose -p "$project" -f "$compose_file" down --volumes --remove-orphans
+  status=$?
+  if (( status != 0 )); then
+    docker compose -p "$project" -f "$compose_file" ps || true
+    docker compose -p "$project" -f "$compose_file" logs --no-color --timestamps || true
+  fi
+  docker compose -p "$project" -f "$compose_file" down --volumes --remove-orphans || true
+  exit "$status"
 }
 trap cleanup EXIT
 
