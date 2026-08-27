@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/zephytiju/meridian-storage-valkey/contracts/cache-envelope.schema.json",
+  "$id": "https://github.com/zephytiju/MeridianValkeyAdapter/contracts/cache-envelope.schema.json",
   "$comment": "SPDX-License-Identifier: Apache-2.0",
   "title": "Meridian Valkey V1 decoded envelope metadata",
   "type": "object",

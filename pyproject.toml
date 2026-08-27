@@ -52,9 +52,9 @@ test = [
 valkey = "meridian_storage.adapters.valkey:ValkeyAdapterFactory"
 
 [project.urls]
-Documentation = "https://github.com/zephytiju/meridian-storage-valkey#readme"
-Issues = "https://github.com/zephytiju/meridian-storage-valkey/issues"
-Repository = "https://github.com/zephytiju/meridian-storage-valkey"
+Documentation = "https://github.com/zephytiju/MeridianValkeyAdapter#readme"
+Issues = "https://github.com/zephytiju/MeridianValkeyAdapter/issues"
+Repository = "https://github.com/zephytiju/MeridianValkeyAdapter"
 
 [tool.hatch.version]
 path = "src/meridian_storage/adapters/valkey/_version.py"
