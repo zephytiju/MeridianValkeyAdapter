@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/zephytiju/meridian-storage-valkey/contracts/conformance-vectors.schema.json",
+  "$id": "https://github.com/zephytiju/MeridianValkeyAdapter/contracts/conformance-vectors.schema.json",
   "$comment": "SPDX-License-Identifier: Apache-2.0",
   "title": "Meridian Valkey V1 conformance vectors",
   "type": "object",

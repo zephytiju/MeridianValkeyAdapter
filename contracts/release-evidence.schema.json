@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/zephytiju/meridian-storage-valkey/contracts/release-evidence.schema.json",
+  "$id": "https://github.com/zephytiju/MeridianValkeyAdapter/contracts/release-evidence.schema.json",
   "$comment": "SPDX-License-Identifier: Apache-2.0",
   "title": "Meridian Valkey release evidence",
   "type": "object",
